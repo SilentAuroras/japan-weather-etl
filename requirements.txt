@@ -1,0 +1,10 @@
+folium
+geopans
+openmeteo_requests
+overpy
+pandas
+pyarrow
+requests
+requests-cache
+retry_requests
+uuid

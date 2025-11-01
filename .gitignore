@@ -1,0 +1,30 @@
+# Data & output
+*.cache.*
+*.csv
+*.parquet
+
+# Build artifacts
+*.egg-info/
+build/
+dist/
+
+# IDE settings
+.idea/
+
+# Python files
+__pycache__/
+*.pyc
+
+# macOS files
+.DS_Store
+
+# Virtual environments
+.venv/
+
+# Terraform files
+*.tfstate*
+crash.log
+*.tfvars*
+*.tfplan
+.terraform/
+.terraform.lock.hcl
