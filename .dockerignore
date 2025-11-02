@@ -1,0 +1,13 @@
+# Data & output
+*.cache.*
+*.csv
+*.parquet
+
+# Build artifacts
+*.egg-info/
+build/
+dist/
+
+# Python files
+__pycache__/
+*.pyc

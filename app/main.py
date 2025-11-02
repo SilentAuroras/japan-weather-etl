@@ -13,6 +13,9 @@ def main():
     # Call extract to generate parquet files
     extract()
 
+    # Print done
+    print("Done ...")
+    
 def extract():
 
     # Pull station list as dataframe

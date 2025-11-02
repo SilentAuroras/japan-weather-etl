@@ -1,5 +1,4 @@
 folium
-geopans
 openmeteo_requests
 overpy
 pandas

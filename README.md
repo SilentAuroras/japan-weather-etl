@@ -1,4 +1,4 @@
-# JR Data Miner
+# Japan Weather ETL
 
 This repository creates a data pipeline Japan weather or events centered around train stations.
 
@@ -22,3 +22,23 @@ The following data sources are integrated into the pipeline:
         -   Precipitation
         -   Wind speed
         -   Wind direction
+
+Steps
+
+1. Build docker image
+
+```bash
+docker build -t japan-weather-etl .
+```
+
+2. Test run the image
+
+```bash
+docker run --rm -it japan-weather-etl
+```
+
+3. Check raw files written (optional)
+
+```bash
+docker run --rm -it japan-weather-etl ls -l /app/data/raw/
+```
