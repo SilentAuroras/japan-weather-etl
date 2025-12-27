@@ -3,6 +3,7 @@
 
 import overpy
 import pandas as pd
+import os
 
 def generate_stations_list():
     """
@@ -10,6 +11,10 @@ def generate_stations_list():
 
     Return: none
     """
+
+    # Create data folders
+    if not os.path.exists('data/raw'):
+        os.makedirs('data/raw')
 
     # Create Overpass API object
     api = overpy.Overpass()

@@ -1,3 +1,4 @@
+flask
 folium
 openmeteo_requests
 overpy

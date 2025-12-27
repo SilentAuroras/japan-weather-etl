@@ -13,5 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy code
 COPY app/ .
 
+# Expose 8080 for cloud run
+EXPOSE 8080
+
 # Run main
 CMD ["python", "main.py"]

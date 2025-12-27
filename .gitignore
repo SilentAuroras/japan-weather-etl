@@ -10,6 +10,7 @@ dist/
 
 # IDE settings
 .idea/
+.vscode/
 
 # Python files
 __pycache__/
@@ -28,3 +29,8 @@ crash.log
 *.tfplan
 .terraform/
 .terraform.lock.hcl
+.databricks
+
+# databricks
+.databricks
+databricks.yml

@@ -1,13 +1,15 @@
 # Standard imports
 import os.path
+import threading
+
 import pandas as pd
+from flask import Flask
 
 # Import API clients
 from api_clients.earthquake_client import get_earthquake_events
 from api_clients.station_client import generate_stations_list
 from api_clients.weather_client import get_weather_forcast
 
-# Main function
 def main():
 
     # Call extract to generate parquet files
@@ -15,7 +17,7 @@ def main():
 
     # Print done
     print("Done ...")
-    
+
 def extract():
 
     # Pull station list as dataframe
