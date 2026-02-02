@@ -26,7 +26,12 @@ docker run --rm -it japan-weather-etl
 docker run --rm -it japan-weather-etl ls -l /app/data/raw/
 ```
 
-4. Create docker repository in Artifact Registry
+4. Authenticate to GCloud for terraform
+```bash
+gcloud auth application-default login
+```
+
+5. Create docker repository in Artifact Registry
 ```bash
 gcloud artifacts repositories create weather-etl-repo --repository-format=docker --location=<REGION> --description="Weather ETL repository"
     
