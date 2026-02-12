@@ -20,13 +20,15 @@ def generate_stations_list():
     api = overpy.Overpass()
     
     # Query rail stations in Japan using ISO 3166-1 code for Japan (JP)
-    # Filter on station > train=yes
-    query = """
-    [out:json][timeout:60];
-    area["ISO3166-1"="JP"][admin_level=2]->.searchArea;
-    nwr["public_transport"="station"]["train"="yes"](area.searchArea);
-    out geom;
-    """
+    query = f'''
+    [out:json][timeout:180];
+    area["ISO3166-1"="JP"]["admin_level"="2"]->.searchArea;
+    node
+      ["railway"="station"]
+      ["public_transport"="station"]
+      (area.searchArea);
+    out;
+    '''
        
     # Send the request
     results = api.query(query)
