@@ -25,6 +25,9 @@ resource "google_cloud_run_v2_service" "default" {
   location = var.region
   deletion_protection = false
 
+  # Hide public endpoint
+  default_uri_disabled = true
+
   template {
     execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
     service_account = google_service_account.run_sa.email

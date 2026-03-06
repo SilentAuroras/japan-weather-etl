@@ -7,13 +7,9 @@
 
 import requests
 import pandas as pd
-import uuid
+import time
 
 def get_earthquake_events():
-    """
-    Retrieve earthquake events from Earthquake API.
-    :return: random_uuid
-    """
 
     # Request the list of recent quake events
     df_recent_events = pd.DataFrame()
@@ -29,15 +25,14 @@ def get_earthquake_events():
     events_list = df_recent_events["json"]
 
     # DataFrame for all detailed reports
-    df_detailed_events = pd.DataFrame()                         
-    
+    df_detailed_events = pd.DataFrame()
+
     # Request JSON details for each quake event
     for event in events_list:
     
         # Generate url for each event
         url = "https://www.jma.go.jp/bosai/quake/data/" + event
-        # print('retrieving: ' + url)
-        
+
         # Send request
         response = requests.get(url)
         if response.status_code == 200:
@@ -45,25 +40,13 @@ def get_earthquake_events():
             temp_df = pd.json_normalize(response_json)
             df_detailed_events = pd.concat([df_detailed_events, temp_df], ignore_index=True)
 
-    # Check if dataframe is empty
-    if not df_detailed_events.empty:
+    # Drop problematic columns before saving to parquet - serialization issue
+    for col in ["Head.Headline.Information", "Head.Headline.Information.Item"]:
+        if col in df_detailed_events.columns:
+            df_detailed_events = df_detailed_events.drop([col], axis=1)
+
+    # Generate timestamp for filename
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
     
-        # Generate one single parquet file for this pull of quake data
-        # Generate random UUID for parquet storage
-        random_uuid = uuid.uuid4()
-
-        # Drop problematic columns before saving to parquet - serialization issue
-        for col in ["Head.Headline.Information", "Head.Headline.Information.Item"]:
-            if col in df_detailed_events.columns:
-                df_detailed_events = df_detailed_events.drop([col], axis=1)
-
-        # Create a parquet file locally
-        filename = f"data/raw/quake_{random_uuid}.parquet"
-        df_detailed_events.to_parquet(filename)
-
-        # Return UUID for tracking
-        return random_uuid
-
-    # Dataframe is empty, do not create parquet file, return 1 error
-    else:
-        return 1
+    # Create a parquet file locally
+    df_detailed_events.to_parquet(f'data/raw/quake-{timestamp}.parquet', index=False)

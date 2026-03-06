@@ -6,11 +6,6 @@ import pandas as pd
 import os
 
 def generate_stations_list():
-    """
-    Generate a list of train stations.
-
-    Return: none
-    """
 
     # Create data folders
     if not os.path.exists('data/raw'):
@@ -40,7 +35,7 @@ def generate_stations_list():
         latitude = node.lat
         longitude = node.lon
         if name:
-            stations.append({"name": name, "lat": latitude, "long": longitude})
+            stations.append({"name": name, "latitude": latitude, "longitude": longitude})
     
     # Generate dataframe for the results
     df = pd.DataFrame(stations)

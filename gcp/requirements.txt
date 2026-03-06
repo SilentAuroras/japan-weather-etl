@@ -1,5 +1,6 @@
 flask
 folium
+geopandas
 openmeteo_requests
 overpy
 pandas
@@ -7,4 +8,5 @@ pyarrow
 requests
 requests-cache
 retry_requests
+scikit-learn
 uuid

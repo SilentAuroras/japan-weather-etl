@@ -33,7 +33,5 @@ crash.log
 
 # databricks
 .databricks
-databricks.yml
-.databricks
 
 .databricks

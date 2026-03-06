@@ -1,9 +1,8 @@
 # Standard imports
 import logging
+import os.path
 import sys
-
 import pandas as pd
-from flask import Flask
 
 # Import API clients
 from api_clients.earthquake_client import get_earthquake_events
@@ -20,26 +19,26 @@ logging.basicConfig(
 def main():
 
     # Pull station list as dataframe
-    logging.info(f'Pulling station list ...')
-    generate_stations_list()
+    logging.info(f'Pulling station list...')
     stations = f'data/raw/station-coordinates.parquet'
+
+    # Generate list if stations list does not already exist
+    if not os.path.exists(stations):
+        generate_stations_list()
+
+    # Read in stations list
     stations = pd.read_parquet(stations)
 
     # Request earthquake data
-    logging.info(f'Pulling earthquake data ...')
+    logging.info(f'Pulling earthquake data...')
     get_earthquake_events()
 
     # Split the dataframe into sections groups for weather request
-    logging.info(f'Pulling weather data ...')
-
-    # Pull latitude/longitude from dataframe
-    pairs = list(zip(stations['lat'], stations['long']))
-
-    # For each station request weather, loop handled in weather_client
-    get_weather_forcast(pairs)
+    logging.info(f'Pulling weather data...')
+    get_weather_forcast(stations)
 
     # Done
-    logging.info("Done ...")
+    logging.info("Done...")
     
 if __name__ == "__main__":
     main()

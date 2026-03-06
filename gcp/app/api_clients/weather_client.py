@@ -3,34 +3,65 @@
 # Request data from JMA weather and earthquake forcast API
 #	- https://open-meteo.com/en/docs/jma-api
 
-import uuid
+import geopandas as gpd
+import numpy as np
+import openmeteo_requests
 import pandas as pd
 import requests_cache
-import openmeteo_requests
+import time
+
 from retry_requests import retry
+from shapely.geometry import Point
+from sklearn.cluster import DBSCAN
 
-def get_weather_forcast(coordinates):
-    """
-    Fetch weather data for given latitude and longitude coordinates using the JMA API.
+def get_weather_forcast(stations):
 
-    Args:
-        coordinates (list of tuple): A list of (latitude, longitude) pairs
-            Example: [(latitude, longitude), (latitude, longitude)]
+    # Create GeoDataFrame from stations list
+    gdf = gpd.GeoDataFrame(
+        stations,
+        geometry=[Point(xy) for xy in zip(stations['longitude'], stations['latitude'])],
+        crs="EPSG:4326"
+    )
+    
+    # Cast CRS to meters
+    gdf = gdf.to_crs(epsg=3857)
+    
+    # Convert degrees to radians
+    coords = np.radians(
+        stations[['latitude', 'longitude']].astype(float).values
+    )
 
-    Return:
-        random_uuid: A randomly generated UUID for the saved parquet file
-    """
+    # 10km epsilon distance in radians = km / radius of earth
+    epsilon = 10 / 6371.0088
+
+    # DBSCAN to find clusters
+    db = DBSCAN(
+        eps = epsilon,
+        # Allow for groups of 1
+        min_samples = 1,
+        metric = 'haversine'
+    )
+
+    # Add a cluster column to group stations by
+    stations['cluster'] = db.fit_predict(coords)
+
+    # Sort the clusters, and take the first item for a representative for weather lookup
+    cluster_rep = stations.sort_values('cluster').groupby('cluster').first().reset_index()
 
     # Set up the Open-Meteo API client
-    cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
-    retry_session = retry(cache_session, retries=3, backoff_factor=0.2)
+    cache_session = requests_cache.CachedSession(backend='memory', expire_after=3600)
+    retry_session = retry(cache_session, retries=10, backoff_factor=1)
     open_meteo = openmeteo_requests.Client(session=retry_session)
 
     # Setup dataframe for all weather forcast requested, includes multiple lat/long locations
-    df = pd.DataFrame()
+    rep_weather = pd.DataFrame()
 
-    # Loop through a list of coordinates
-    for latitude, longitude in coordinates:
+    # Loop through a list of representatives
+    for row in cluster_rep.itertuples():
+
+        # Pull out latitude and longitude
+        latitude = row.latitude
+        longitude = row.longitude
 
         # Set up the URL and parameters
         url = "https://api.open-meteo.com/v1/forecast"
@@ -54,8 +85,10 @@ def get_weather_forcast(coordinates):
         # Generate response dictionary
         current = responses[0].Current()
         weather_data = {
+            'cluster': row.cluster,                                 # Cluster ID
             "latitude": latitude,                                   # Provided latitude
             "longitude": longitude,                                 # Provided longitude
+            "geography": f"POINT({longitude} {latitude})",          # BigQuery GEOGRAPHY
             "temperature_2m": current.Variables(0).Value(),         # Current temperature
             "is_day": current.Variables(1).Value(),                 # Current day or night
             "precipitation": current.Variables(2).Value(),          # Current precipitation
@@ -68,15 +101,17 @@ def get_weather_forcast(coordinates):
         new_data = pd.DataFrame(weather_data, index=[0])
 
         # Append to the existing dataframe
-        df = pd.concat([df, new_data], ignore_index=True)
+        rep_weather = pd.concat([rep_weather, new_data], ignore_index=True)
 
-    # Generate one single parquet file for this pull of weather data
-    # Generate random UUID for parquet storage
-    random_uuid = uuid.uuid4()
+    # Merge weather dataframe back into all stations, assign weather by cluster
+    df = stations.merge(
+        rep_weather,
+        on='cluster',
+        how='left'
+    )
 
+    # Generate timestamp for filename
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    
     # Create a parquet file locally
-    filename = f"data/raw/weather_{random_uuid}.parquet"
-    df.to_parquet(filename)
-
-    # Return UUID for tracking
-    return random_uuid
+    df.to_parquet(f'data/raw/weather-{timestamp}.parquet', index=False)
