@@ -35,7 +35,12 @@ def generate_stations_list():
         latitude = node.lat
         longitude = node.lon
         if name:
-            stations.append({"name": name, "latitude": latitude, "longitude": longitude})
+            stations.append({
+                "name": name,
+                "latitude": latitude,
+                "longitude": longitude,
+                "geography": f"POINT({longitude} {latitude})"
+            })
     
     # Generate dataframe for the results
     df = pd.DataFrame(stations)
