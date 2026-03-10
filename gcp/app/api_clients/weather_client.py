@@ -103,12 +103,19 @@ def get_weather_forcast(stations):
         # Append to the existing dataframe
         rep_weather = pd.concat([rep_weather, new_data], ignore_index=True)
 
+    # Weather columns to keep, drop location and geography for representatives
+    weather_columns = [
+        'cluster',
+        'temperature_2m',
+        'is_day',
+        'precipitation',
+        'wind_speed_10m',
+        'wind_direction_10m',
+        'timestamp'
+    ]
+    
     # Merge weather dataframe back into all stations, assign weather by cluster
-    df = stations.merge(
-        rep_weather,
-        on='cluster',
-        how='left'
-    )
+    df = stations.merge(rep_weather[weather_columns], on='cluster', how='left')
 
     # Generate timestamp for filename
     timestamp = time.strftime("%Y%m%d-%H%M%S")

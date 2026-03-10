@@ -30,7 +30,21 @@ resource "google_bigquery_table" "japan-weather-table" {
   table_id   = "japan-weather-table-001"
   deletion_protection = false
   external_data_configuration {
-    autodetect = true
+    autodetect = false
+    # Schema from parquet DDL
+    schema = jsonencode([
+       { name = "name", type = "STRING", mode = "NULLABLE" },
+       { name = "latitude", type = "NUMERIC", mode = "NULLABLE", precision = 9, scale = 7 },
+       { name = "longitude", type = "NUMERIC", mode = "NULLABLE", precision = 10, scale = 7 },
+       { name = "geography", type = "GEOGRAPHY", mode = "NULLABLE" },
+       { name = "cluster", type = "INT64", mode = "NULLABLE" },
+       { name = "temperature_2m", type = "FLOAT64", mode = "NULLABLE" },
+       { name = "is_day", type = "FLOAT64", mode = "NULLABLE" },
+       { name = "precipitation", type = "FLOAT64", mode = "NULLABLE" },
+       { name = "wind_speed_10m", type = "FLOAT64", mode = "NULLABLE" },
+       { name = "wind_direction_10m", type = "FLOAT64", mode = "NULLABLE" },
+       { name = "timestamp", type = "TIMESTAMP", mode = "NULLABLE" }
+     ])
     source_format = "PARQUET"
     source_uris = [
       "${google_storage_bucket.docker-mount-gcs.url}/raw/weather*.parquet"
