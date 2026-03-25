@@ -1,0 +1,70 @@
+# Bundle name
+bundle:
+  name: japan-weather-etl-bundle
+
+# Resources
+resources:
+
+  # Define pipeline
+  pipelines:
+    japan_weather_dlt_pipeline:
+
+      # Name and catalog
+      name: "Japan Weather DLT Pipeline"
+      catalog: japan_weather
+      schema: weather_changes
+
+      # Pipeline settings
+      development: false
+      continuous: false
+      photon: true
+      serverless: true
+
+      # Python dependencies
+      environment:
+        dependencies:
+          - geodatasets
+          - geopandas
+          - numpy
+          - openmeteo_requests
+          - overpy
+          - pandas==2.2.3 # force 2.x otherwise get "kdf not defined" error
+          - requests-cache
+          - retry_requests
+          - scikit-learn
+          - shapely
+
+      # Define pipeline scripts
+      libraries:
+        # Script to pull all stations
+        - file:
+            path: "./pipeline/stations.py"
+        # Weather client
+        - file:
+            path: "./pipeline/weather.py"
+        # Earthquake client
+        - file:
+            path: "./pipeline/earthquake.py"
+        # Silver tables
+        - file:
+            path: "./pipeline/silver-tables.sql"
+        # Gold tables
+        - file:
+            path: "./pipeline/gold-tables.sql"
+
+  # Job to run daily
+  jobs:
+
+    # Define job to run the pipeline
+    daily_weather_run:
+      name: "Daily Japan Weather Pipeline Trigger"
+      tasks:
+        - task_key: run_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.japan_weather_dlt_pipeline.id}
+
+     # Run daily at 11am Tokyo time
+      schedule:
+        quartz_cron_expression: "0 0 11 * * ?"
+        timezone_id: "Asia/Tokyo"
+        pause_status: "UNPAUSED"
