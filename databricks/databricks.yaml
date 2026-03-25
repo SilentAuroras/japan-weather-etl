@@ -47,10 +47,10 @@ resources:
             path: "./pipeline/earthquake.py"
         # Silver tables
         - file:
-            path: "./pipeline/silver-tables.sql"
+            path: "./pipeline/silver-tables.py"
         # Gold tables
         - file:
-            path: "./pipeline/gold-tables.sql"
+            path: "./pipeline/gold-tables.py"
 
   # Job to run daily
   jobs:
