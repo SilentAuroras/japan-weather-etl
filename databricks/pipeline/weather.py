@@ -29,18 +29,34 @@ weather_schema = T.StructType([
     schema = weather_schema
 )
 def create_weather_table():
+    """
+    Simple function to call the get_weather_forecast() function and generate spark df for table
 
+    Returns:
+        Spark dataframe with current weather
+
+    """
     # Read stations from table as pandas
     stations = spark.read.table("stations").toPandas()
 
     # Call weather function
-    df = get_weather_forcast(stations)
+    df = get_weather_forecast(stations)
 
     # return spark df
     return spark.createDataFrame(df, schema=weather_schema)
 
-def get_weather_forcast(stations):
+def get_weather_forecast(stations):
 
+    """
+    Function to get today's weather for a given set of train stations
+
+    Args:
+        stations: Pandas dataframe with stations (name, latitude, longitude)
+
+    Returns:
+        Pandas dataframe with current weather
+
+    """
     # Create GeoDataFrame from stations list
     gdf = gpd.GeoDataFrame(
         stations,

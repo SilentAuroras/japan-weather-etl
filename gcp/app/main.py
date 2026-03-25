@@ -7,7 +7,7 @@ import pandas as pd
 # Import API clients
 from api_clients.earthquake_client import get_earthquake_events
 from api_clients.station_client import generate_stations_list
-from api_clients.weather_client import get_weather_forcast
+from api_clients.weather_client import get_weather_forecast
 
 # Setup logging
 logging.basicConfig(
@@ -35,7 +35,7 @@ def main():
 
     # Split the dataframe into sections groups for weather request
     logging.info(f'Pulling weather data...')
-    get_weather_forcast(stations)
+    get_weather_forecast(stations)
 
     # Done
     logging.info("Done...")

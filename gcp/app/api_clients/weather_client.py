@@ -14,7 +14,7 @@ from retry_requests import retry
 from shapely.geometry import Point
 from sklearn.cluster import DBSCAN
 
-def get_weather_forcast(stations):
+def get_weather_forecast(stations):
 
     # Create GeoDataFrame from stations list
     gdf = gpd.GeoDataFrame(
