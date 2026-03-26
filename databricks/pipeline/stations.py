@@ -12,7 +12,6 @@ SCHEMA = T.StructType([
 # Define table for stations list
 @dp.table(
     name="stations",
-    comment="Table to store station name and location(latitude/longitude)",
     schema=SCHEMA
 )
 def generate_stations_list():
