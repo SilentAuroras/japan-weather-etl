@@ -23,7 +23,10 @@ def generate_stations_list():
     """
 
     # Create Overpass API object
-    api = overpy.Overpass()
+    api = overpy.Overpass(
+        max_retry_count=10,
+        retry_timeout=60
+    )
 
     # Query rail stations in Japan using ISO 3166-1 code for Japan (JP)
     query = f'''
