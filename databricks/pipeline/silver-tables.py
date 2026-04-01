@@ -44,3 +44,32 @@ def clean_earthquake_events():
 
     # Return filtered df
     return df_cleaned.select(columns)
+
+# Create a column for cluster average lat/long
+@dp.table(
+    name='weather_silver'
+)
+def clean_weather_table():
+
+    # Read weather table
+    df = spark.read.table('weather')
+
+    # Iterate each cluster and avg lat/long
+    df_means = df.groupby(['cluster']).mean()
+
+    # Create new cluster column - average the cluster lat/long
+    df_means = df_means[['cluster', 'avg(latitude)', 'avg(longitude)']]
+
+    # Rename columns
+    df_means = df_means.withColumnRenamed('avg(latitude)', 'clusterLatitude') \
+        .withColumnRenamed('avg(longitude)', 'clusterLongitude')
+
+    # Merge the dataframes back
+    df_clean = df.join(
+        df_means,
+        on='cluster',
+        how='left',
+    )
+
+    # Calculate area covered in km squared
+    return df_clean
