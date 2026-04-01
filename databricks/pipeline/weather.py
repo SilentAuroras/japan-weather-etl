@@ -72,8 +72,8 @@ def get_weather_forecast(stations):
         stations[['latitude', 'longitude']].astype(float).values
     )
 
-    # 10km epsilon distance in radians = km / radius of earth
-    epsilon = 10 / 6371.0088
+    # 6km epsilon distance in radians = km / radius of earth
+    epsilon = 6 / 6371.0088
 
     # DBSCAN to find clusters
     db = DBSCAN(
