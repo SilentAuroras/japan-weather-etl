@@ -51,6 +51,9 @@ resources:
         # Gold tables
         - file:
             path: "./pipeline/gold-tables.py"
+        # ML tables
+        - file:
+            path: "./pipeline/ml-tables.py"
 
   # Job to run daily
   jobs:
