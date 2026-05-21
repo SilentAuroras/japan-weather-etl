@@ -51,6 +51,11 @@ resource "google_cloud_run_v2_service" "default" {
   }
 }
 
+// Cloud run output url for curl
+output "cloud_run_output" {
+  value = google_cloud_run_v2_service.default.urls[0]
+}
+
 // Scheduler service account
 resource "google_service_account" "scheduler_sa" {
   account_id = "scheduler-sa"
