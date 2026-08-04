@@ -8,22 +8,22 @@ terraform {
   }
 }
 
-// Pull from terraform.tfvars
+// Project name - pull from terraform.tfvars
 variable "project" {
   type = string
 }
 
-// Pull from terraform.tfvars
+// Region - pull from terraform.tfvars
 variable "region" {
   type = string
 }
 
-// Pull from terraform.tfvars
+// Location - pull from terraform.tfvars
 variable "location" {
   type = string
 }
 
-// Set GCP variables
+// Set GCP provider variables
 provider "google" {
   region = var.region
   project = var.project

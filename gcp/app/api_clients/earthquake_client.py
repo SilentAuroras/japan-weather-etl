@@ -1,18 +1,15 @@
-# Earthquake data API calls
-
-# Pull earthquake data from the Japan Meteorological Agency
-#   - List of recent quakes - https://www.jma.go.jp/bosai/quake/data/list.json
-#   - Drill down into each event's json to get each event's location including: latitude and longitude
-#       - Example: https://www.jma.go.jp/bosai/quake/data/20250903060513_20250903060214_VXSE5k_1.json
-
+import logging
 import requests
 import pandas as pd
 import time
 
+# Pull earthquake data from the Japan Meteorological Agency
 def get_earthquake_events():
 
     # Request the list of recent quake events
     df_recent_events = pd.DataFrame()
+
+    # List of recent quakes - https://www.jma.go.jp/bosai/quake/data/list.json
     recent_data_url = "https://www.jma.go.jp/bosai/quake/data/list.json"
     
     # Send request
@@ -27,7 +24,7 @@ def get_earthquake_events():
     # DataFrame for all detailed reports
     df_detailed_events = pd.DataFrame()
 
-    # Request JSON details for each quake event
+    # Drill down into each event's json to get each event's location
     for event in events_list:
     
         # Generate url for each event
@@ -35,10 +32,19 @@ def get_earthquake_events():
 
         # Send request
         response = requests.get(url)
+
+        # Request JSON details for each quake event
         if response.status_code == 200:
             response_json = response.json()
             temp_df = pd.json_normalize(response_json)
             df_detailed_events = pd.concat([df_detailed_events, temp_df], ignore_index=True)
+
+            # Log success
+            logging.info(f"Successfully downloaded quake data")
+
+        # Catch other response codes
+        else:
+            logging.error(f"Unable to download quake json data: {response.status_code}")
 
     # Drop problematic columns before saving to parquet - serialization issue
     for col in ["Head.Headline.Information", "Head.Headline.Information.Item"]:

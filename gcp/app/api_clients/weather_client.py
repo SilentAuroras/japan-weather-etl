@@ -1,15 +1,10 @@
-# Weather data API call client
-
-# Request data from JMA weather and earthquake forcast API
-#	- https://open-meteo.com/en/docs/jma-api
-
 import geopandas as gpd
+import logging
 import numpy as np
 import openmeteo_requests
 import pandas as pd
 import requests_cache
 import time
-
 from retry_requests import retry
 from shapely.geometry import Point
 from sklearn.cluster import DBSCAN
@@ -34,10 +29,9 @@ def get_weather_forecast(stations):
     # 6km epsilon distance in radians = km / radius of earth
     epsilon = 6 / 6371.0088
 
-    # DBSCAN to find clusters
+    # DBSCAN to find clusters - allow for groups of 1
     db = DBSCAN(
         eps = epsilon,
-        # Allow for groups of 1
         min_samples = 1,
         metric = 'haversine'
     )
@@ -122,3 +116,6 @@ def get_weather_forecast(stations):
     
     # Create a parquet file locally
     df.to_parquet(f'data/raw/weather-{timestamp}.parquet', index=False)
+
+    # Log done
+    logging.info(f"Weather client finished")

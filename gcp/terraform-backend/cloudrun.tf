@@ -12,7 +12,7 @@ resource "google_service_account" "run_sa" {
   display_name = "Cloud Run runtime service account"
 }
 
-// GCS storage account bucket
+// GCS storage account bucket permissions
 resource "google_storage_bucket_iam_member" "run_sa_writer" {
   bucket = google_storage_bucket.docker-mount-gcs.name
   role   = "roles/storage.objectAdmin"
@@ -32,6 +32,7 @@ resource "google_cloud_run_v2_service" "default" {
     // Disable health check
     health_check_disabled = true
 
+    # Docker image from cloud build
     containers {
       image = "${var.region}-docker.pkg.dev/${var.project}/weather-etl-repo/japan-weather-etl:tag1"
       
@@ -41,6 +42,8 @@ resource "google_cloud_run_v2_service" "default" {
         name       = "bucket"
       }
     }
+
+    // Set storage to gcs
     volumes {
       name = "bucket"
       gcs {
@@ -51,7 +54,7 @@ resource "google_cloud_run_v2_service" "default" {
   }
 }
 
-// Cloud run output url for curl
+// Cloud run output url for curl trigger
 output "cloud_run_output" {
   value = google_cloud_run_v2_service.default.urls[0]
 }
@@ -62,7 +65,7 @@ resource "google_service_account" "scheduler_sa" {
   display_name = "Cloud Scheduler Service Account"
 }
 
-// Scheduler Membership
+// Scheduler Membership add to run cloudrun function
 resource "google_project_iam_member" "scheduler_sa_membership" {
   member  = "serviceAccount:${google_service_account.scheduler_sa.email}"
   project = var.project
@@ -77,13 +80,18 @@ resource "google_cloud_scheduler_job" "scheduler-job" {
   // 2am daily UTC
   schedule = "0 2 * * *"
   time_zone = "Etc/UTC"
-  
+
+  # Request target to cloudrun url
   http_target {
+
+    // Define request
     uri = google_cloud_run_v2_service.default.urls[0]
     http_method = "POST"
     headers = {
       "Content-Type" = "application/json"
     }
+
+    // Use scheduler account
     oidc_token {
       service_account_email = google_service_account.scheduler_sa.email
       audience = google_cloud_run_v2_service.default.urls[0]

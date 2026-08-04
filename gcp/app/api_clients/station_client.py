@@ -1,10 +1,8 @@
-# JR Station Location Generator
-# This script generates a list of train stations in Japan with their latitude and longitude
-
+import os
 import overpy
 import pandas as pd
-import os
 
+# Generate a list of train stations in Japan with their latitude and longitude
 def generate_stations_list():
 
     # Create data folders
@@ -42,9 +40,8 @@ def generate_stations_list():
                 "geography": f"POINT({longitude} {latitude})"
             })
     
-    # Generate dataframe for the results
+    # Generate dataframe for results
     df = pd.DataFrame(stations)
 
     # Save to parquet file
-    # Format: station name, latitude, longitude
     df.to_parquet("data/raw/station-coordinates.parquet", index=False)

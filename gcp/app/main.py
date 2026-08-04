@@ -1,7 +1,6 @@
 # Standard imports
 import logging
 import os.path
-import sys
 import pandas as pd
 
 # Import API clients
@@ -9,13 +8,7 @@ from api_clients.earthquake_client import get_earthquake_events
 from api_clients.station_client import generate_stations_list
 from api_clients.weather_client import get_weather_forecast
 
-# Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)],
-)
-
+# Define main and call helpers
 def main():
 
     # Pull station list as dataframe

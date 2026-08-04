@@ -7,10 +7,10 @@ WORKDIR /app
 # Copy python requirements
 COPY requirements.txt .
 
-# Instal requirements
+# Install requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy code
+# Copy app code
 COPY app/ .
 
 # Expose 8080 for cloud run

@@ -9,4 +9,3 @@ requests
 requests-cache
 retry_requests
 scikit-learn
-uuid
