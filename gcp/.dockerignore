@@ -1,7 +1,9 @@
-# Data & output
+# Data files
 *.cache.*
 *.csv
 *.parquet
+*.sqlite
+*.sqlite3
 
 # Build artifacts
 *.egg-info/

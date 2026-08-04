@@ -2,6 +2,8 @@
 *.cache.*
 *.csv
 *.parquet
+*.sqlite
+*.sqlite3
 
 # Build artifacts
 *.egg-info/
@@ -9,7 +11,6 @@ build/
 dist/
 
 # IDE settings
-.idea/
 .vscode/
 
 # Python files
