@@ -5,11 +5,7 @@ import pandas as pd
 # Generate a list of train stations in Japan with their latitude and longitude
 def generate_stations_list():
 
-    # Create data folders
-    if not os.path.exists('data/raw'):
-        os.makedirs('data/raw')
-
-    # Create Overpass API object
+    # Create Overpass API object with user-agent to fix 406 issue
     api = overpy.Overpass()
     
     # Query rail stations in Japan using ISO 3166-1 code for Japan (JP)
@@ -43,5 +39,5 @@ def generate_stations_list():
     # Generate dataframe for results
     df = pd.DataFrame(stations)
 
-    # Save to parquet file
-    df.to_parquet("data/raw/station-coordinates.parquet", index=False)
+    # Return df
+    return df

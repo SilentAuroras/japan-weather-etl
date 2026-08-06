@@ -51,8 +51,5 @@ def get_earthquake_events():
         if col in df_detailed_events.columns:
             df_detailed_events = df_detailed_events.drop([col], axis=1)
 
-    # Generate timestamp for filename
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    
-    # Create a parquet file locally
-    df_detailed_events.to_parquet(f'data/raw/quake-{timestamp}.parquet', index=False)
+    # Return df
+    return df_detailed_events

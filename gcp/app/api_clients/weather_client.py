@@ -111,11 +111,8 @@ def get_weather_forecast(stations):
     # Merge weather dataframe back into all stations, assign weather by cluster
     df = stations.merge(rep_weather[weather_columns], on='cluster', how='left')
 
-    # Generate timestamp for filename
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    
-    # Create a parquet file locally
-    df.to_parquet(f'data/raw/weather-{timestamp}.parquet', index=False)
-
     # Log done
     logging.info(f"Weather client finished")
+
+    # Return df
+    return df
