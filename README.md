@@ -96,7 +96,6 @@ gcloud artifacts repositories list
 5. Submit docker image for Cloud Build
 ```bash
 gcloud builds submit --region=<REGION> --tag <REGION>-docker.pkg.dev/PROJECT_ID/weather-etl-repo/japan-weather-etl:tag1 
-
 ```
 
 6. Setup terraform variables file (_terraform.tfvars_) with the following set:
