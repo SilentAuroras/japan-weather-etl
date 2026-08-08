@@ -34,23 +34,33 @@ The following shows images of the Databricks pipeline, however the GCP setup is 
 
 The data flow of the pipeline can be seen in the figure below.
 
-![Data Flow](screenshots//Data%20Flow.png)
+<img src="screenshots/Data%20Flow.png" alt="Data Flow" width="900" />
 
 The pipeline begins by parsing the parquet file for a list of train stations. This list is created from an OpenStreetMap (OSM) dataset, and uploaded to a volume. This parses the dataset, and creates a stations table.
 
-![Stations](screenshots/Stations.png)
+<img src="screenshots/Stations.png" alt="Stations" width="400" />
 
 Once parsed, the stations are grouped using DBSCAN to find clusters of train stations. This helps limit the API calls to OpenMeteo weather API, by only grabbing weather for a selected representative within that cluster. For each of the clusters, weather such as temperature, wind speed, and precipitation are obtained, and reassigned to each station within the cluster.
 
-![Weather](screenshots/Weather.png)
+<img src="screenshots/Weather.png" alt="Weather" width="700" />
 
 Seperately, earthquake events are pulled from the JMA quake API by parsing JSON files on the website, once parsed, these files are parsed into a earthquake table.
 
-![Earthquake](screenshots/Earthquake.png)
+<img src="screenshots/Earthquake.png" alt="Earthquake" width="700" />
 
 Finally, once all initial tables are created, silver and gold tables are created from the base tables by filtering out troublesome rows, nulls, etc.
 
-# Deployment Steps (Databricks)
+The dashboards were created using tableau and imported into Databricks and GCP.
+
+Temperature:
+
+<img src="screenshots/Temperatures.png" alt="Temperatures" width="550" />
+
+Weather Summary:
+
+<img src="screenshots/Summary.png" alt="Weather Summary" width="700" />
+
+
 1. Databricks DABs are used to deploy the pipeline, a YAML file is created to deploy this pipeline [dab](databricks/databricks.yaml)
 2. Run the SQL commands to create catalog, schema, volumes [create-env.sql](databricks/create-env.sql)
 3. Due to newer OSM API requirements, a parquet file ![stations-2025.parquet](databricks/data/stations-list-2025.parquet) should be uploaded to a volume, then referenced in ![stations.py](databricks/pipeline/stations.py)

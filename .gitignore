@@ -35,3 +35,6 @@ crash.log
 
 # databricks
 .databricks
+
+# Tableau
+*.twb
