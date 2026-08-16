@@ -1,9 +1,9 @@
 // BigQuery dataset for pipeline
 resource "google_bigquery_dataset" "japan-weather-dataset" {
   friendly_name = "japan-weather-dataset"
+  dataset_id = "japan_weather_dataset_001"
   description = "Dataset for stations weather and earthquake data read from GCS"
   location = var.location
-  dataset_id = "japan_weather_dataset_001"
   delete_contents_on_destroy = true
 }
 

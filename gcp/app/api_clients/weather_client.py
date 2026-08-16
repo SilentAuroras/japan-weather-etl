@@ -4,11 +4,11 @@ import numpy as np
 import openmeteo_requests
 import pandas as pd
 import requests_cache
-import time
 from retry_requests import retry
 from shapely.geometry import Point
 from sklearn.cluster import DBSCAN
 
+# Function to gather weather forecast for a list of stations
 def get_weather_forecast(stations):
 
     # Create GeoDataFrame from stations list
@@ -26,7 +26,7 @@ def get_weather_forecast(stations):
         stations[['latitude', 'longitude']].astype(float).values
     )
 
-    # 6km epsilon distance in radians = km / radius of earth
+    # Set cluster size - 6km epsilon distance in radians = km / radius of earth
     epsilon = 6 / 6371.0088
 
     # DBSCAN to find clusters - allow for groups of 1
@@ -75,9 +75,9 @@ def get_weather_forecast(stations):
 
         # Send request to the API
         responses = open_meteo.weather_api(url, params=params)
+        current = responses[0].Current()
 
         # Generate response dictionary
-        current = responses[0].Current()
         weather_data = {
             'cluster': row.cluster,                                 # Cluster ID
             "latitude": latitude,                                   # Provided latitude

@@ -8,8 +8,21 @@ from api_clients.earthquake_client import get_earthquake_events
 from api_clients.station_client import generate_stations_list
 from api_clients.weather_client import get_weather_forecast
 
+# Define headers - pull from env variables
+OVERPASS_USER_AGENT = os.getenv("OVERPASS_USER_AGENT")
+OVERPASS_REFERER = os.getenv("OVERPASS_REFERER")
+
 # Define main to call helpers and create parquet files
 def main():
+
+    # Check env variables exist
+    if not OVERPASS_USER_AGENT or not OVERPASS_REFERER:
+
+        # Log error
+        logging.error(f'Env variables are not set: OVERPASS_USER_AGENT or OVERPASS_REFERER')
+
+        # Return
+        return 1
 
     # ---------------------------------------------
     # Stations
@@ -30,6 +43,7 @@ def main():
         # Generate stations parquet
         stations_df.to_parquet("data/raw/station-coordinates.parquet", index=False)
 
+    # Use existing stations list
     else:
 
         # Read parquet
@@ -61,8 +75,13 @@ def main():
     # Call quake function and get df
     quake_df = get_earthquake_events()
 
+    # Check if df empty
+    if quake_df.empty:
+        logging.error(f'Unable to pull earthquake events')
+
     # Create a parquet file locally
-    quake_df.to_parquet(f'data/raw/quake-{timestamp}.parquet', index=False)
+    else:
+        quake_df.to_parquet(f'data/raw/quake-{timestamp}.parquet', index=False)
 
     # ---------------------------------------------
     # Summary

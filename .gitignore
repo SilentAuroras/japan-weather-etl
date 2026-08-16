@@ -14,17 +14,17 @@ dist/
 .vscode/
 .idea/
 
-# Python files
+# Python
 __pycache__/
 *.pyc
 
-# macOS files
+# macOS
 .DS_Store
 
 # Virtual environments
 .venv/
 
-# Terraform files
+# Terraform
 *.tfstate*
 crash.log
 *.tfvars*
@@ -33,7 +33,7 @@ crash.log
 .terraform.lock.hcl
 .databricks
 
-# databricks
+# Databricks
 .databricks
 
 # Tableau

@@ -41,6 +41,18 @@ resource "google_cloud_run_v2_service" "default" {
         mount_path = "/app/data/"
         name       = "bucket"
       }
+
+      # Env variables for overpass headers - user_agent
+      env {
+        name = "OVERPASS_USER_AGENT"
+        value = var.overpass_user_agent
+      }
+
+      # Env variables for overpass headers - referer
+      env {
+        name = "OVERPASS_REFERER"
+        value = var.overpass_referer
+      }
     }
 
     // Set storage to gcs
