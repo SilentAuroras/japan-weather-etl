@@ -1,0 +1,67 @@
+name: "Build and Deploy Docker to Cloud Run"
+
+# Deploy on main branch
+on:
+  push:
+    branches:
+      - main
+
+# Configure env variables - pull from repo secrets
+env:
+  PROJECT_ID: '${{ secrets.GCP_PROJECT_ID }}'
+  REGION: '${{ secrets.GCP_REGION }}'
+  SERVICE: '${{ secrets.CLOUD_RUN_SERVICE }}'
+  WORKLOAD_IDENTITY_PROVIDER: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
+
+# Define job to build and deploy container to Cloud Run
+jobs:
+  deploy:
+    runs-on: 'ubuntu-latest'
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    # Steps
+    steps:
+
+      # Checkout
+      - name: 'Checkout'
+        uses: actions/checkout@v6
+
+      # Generate access token for GCP
+      - name: 'Authenticate to GCP'
+        id: auth
+        uses: 'google-github-actions/auth@v3'
+        with:
+          project_id: '${{ env.PROJECT_ID }}'
+          workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+
+      # Docker auth and build
+      - name: 'Docker Auth'
+        uses: 'docker/login-action@v3'
+        with:
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.auth_token }}'
+          registry: '${{ env.REGION }}-docker.pkg.dev'
+
+      # Build and push to GCP registry
+      - name: 'Build and Push Container'
+        run: |-
+          DOCKER_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+          docker build --tag "${DOCKER_TAG}" .
+          docker push "${DOCKER_TAG}"
+      
+      # Deploy to cloud run
+      - name: 'Deploy to Cloud Run'
+        id: deploy
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: '${{ env.SERVICE }}'
+          region: '${{ env.REGION }}'
+          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}'
+      
+      # Output
+      - name: 'Show output'
+        run: |2-
+          echo ${{ steps.deploy.outputs.url }}
