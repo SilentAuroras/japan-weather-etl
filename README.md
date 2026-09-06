@@ -73,6 +73,26 @@ Weather Summary:
    ```
 
 # Deployment Steps (GCP)
+
+GCP deployment is handled using GitHub Actions in the following workflow action ![gcp-cloudrun-workflow](.github/workflows/gcp-cloudrun-workflow.yml)
+
+1. Enable the following Google Cloud APIs:
+- Artifact Registry (artifactregistry.googleapis.com)
+- Cloud Run (run.googleapis.com)
+- IAM Credentials API (iamcredentials.googleapis.com)
+
+2. Create and configure a Workload Identity Provider for GitHub
+
+3. Configure the following repository secrets for actions:
+```
+GCP_PROJECT_ID
+GCP_REGION
+CLOUD_RUN_SERVICE
+GCP_WORKLOAD_IDENTITY_PROVIDER
+```
+
+This deployment is done using GitHub Actions, however manual GCP deployment can be performed as follows.
+
 1. Build docker image
 
 ```bash
@@ -113,6 +133,8 @@ gcloud builds submit --region=<REGION> --tag <REGION>-docker.pkg.dev/PROJECT_ID/
 project = ""
 region = ""
 location = ""
+overpass_referer = ""
+overpass_user_agent = ""
 ```
 
 7. Deploy using terraform
