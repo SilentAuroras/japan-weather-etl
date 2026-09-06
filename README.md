@@ -135,6 +135,8 @@ region = ""
 location = ""
 overpass_referer = ""
 overpass_user_agent = ""
+looker-id = ""
+looker-secret = ""
 ```
 
 7. Deploy using terraform
