@@ -88,7 +88,9 @@ GCP deployment is handled using GitHub Actions in the following workflow action 
 GCP_PROJECT_ID
 GCP_REGION
 CLOUD_RUN_SERVICE
+GCP_ARTIFACT_REPOSITORY
 GCP_WORKLOAD_IDENTITY_PROVIDER
+GCP_SERVICE_ACCOUNT_EMAIL
 ```
 
 This deployment is done using GitHub Actions, however manual GCP deployment can be performed as follows.
@@ -135,23 +137,11 @@ region = ""
 location = ""
 overpass_referer = ""
 overpass_user_agent = ""
-looker-id = ""
-looker-secret = ""
 ```
 
 7. Deploy using terraform
 ```bash
-cd terraform-backend
-terraform init
-terraform apply
-```
-
-8. Trigger function once to create parquet
-Trigger the cloud run function in gcp once to create a parquet file
-
-9. Deploy front end
-```bash
-cd terraform-frontend
+cd terraform
 terraform init
 terraform apply
 ```

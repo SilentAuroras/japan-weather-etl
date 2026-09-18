@@ -11,7 +11,9 @@ env:
   PROJECT_ID: '${{ secrets.GCP_PROJECT_ID }}'
   REGION: '${{ secrets.GCP_REGION }}'
   SERVICE: '${{ secrets.CLOUD_RUN_SERVICE }}'
+  ARTIFACT_REPOSITORY: '${{ secrets.GCP_ARTIFACT_REPOSITORY }}'
   WORKLOAD_IDENTITY_PROVIDER: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
+  GCP_SERVICE_ACCOUNT_EMAIL: '${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}'
 
 # Define job to build and deploy container to Cloud Run
 jobs:
@@ -36,19 +38,20 @@ jobs:
         with:
           project_id: '${{ env.PROJECT_ID }}'
           workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+          service_account: '${{ env.GCP_SERVICE_ACCOUNT_EMAIL }}'
 
       # Docker auth and build
       - name: 'Docker Auth'
         uses: 'docker/login-action@v3'
         with:
           username: 'oauth2accesstoken'
-          password: '${{ steps.auth.outputs.auth_token }}'
+          password: '${{ steps.auth.outputs.access_token }}'
           registry: '${{ env.REGION }}-docker.pkg.dev'
 
       # Build and push to GCP registry
       - name: 'Build and Push Container'
         run: |-
-          DOCKER_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+          DOCKER_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
           docker build --tag "${DOCKER_TAG}" ./gcp
           docker push "${DOCKER_TAG}"
       
@@ -59,7 +62,7 @@ jobs:
         with:
           service: '${{ env.SERVICE }}'
           region: '${{ env.REGION }}'
-          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}'
+          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.ARTIFACT_REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}'
       
       # Output
       - name: 'Show output'
