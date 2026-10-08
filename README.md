@@ -29,6 +29,13 @@ For both deployment scenarios, the following data is integrated:
         -   Wind speed
         -   Wind direction
 
+# Limitations
+The Overpass API has limitations on throughput and query size, so several workarounds were made for the projects to work:
+    1. GCP
+        Limit OverPass query to just query Shinkansen stations
+    2. Databricks
+        Read a parquet file of stations exported from OpenStreetMap uploaded to a volume
+
 # Data flow
 The following shows images of the Databricks pipeline, however the GCP setup is relatively similar.
 
@@ -72,65 +79,27 @@ Weather Summary:
    databricks bundle deploy
    ```
 
-# Deployment Steps (GCP)
-
-GCP deployment is handled using GitHub Actions in the following workflow action ![gcp-cloudrun-workflow](.github/workflows/gcp-cloudrun-workflow.yml)
+# Deployment Steps (GCP with Terraform)
 
 1. Enable the following Google Cloud APIs:
 - Artifact Registry (artifactregistry.googleapis.com)
 - Cloud Run (run.googleapis.com)
-- IAM Credentials API (iamcredentials.googleapis.com)
 
-2. Create and configure a Workload Identity Provider for GitHub
+2. Authenticate to GCP for Terraform:
 
-3. Configure the following repository secrets for actions:
-```
-GCP_PROJECT_ID
-GCP_REGION
-CLOUD_RUN_SERVICE
-GCP_ARTIFACT_REPOSITORY
-GCP_WORKLOAD_IDENTITY_PROVIDER
-GCP_SERVICE_ACCOUNT_EMAIL
-```
-
-This deployment is done using GitHub Actions, however manual GCP deployment can be performed as follows.
-
-1. Build docker image
-
-```bash
-docker build -t japan-weather-etl .
-```
-
-2. Test run the image locally (optional)
-
-```bash
-docker run --rm -it japan-weather-etl
-```
-
-3. Check raw files written (optional)
-
-```bash
-docker run --rm -it japan-weather-etl ls -l /app/data/raw/
-```
-
-4. Authenticate to GCloud for terraform
 ```bash
 gcloud auth application-default login
 ```
 
-5. Create docker repository in Artifact Registry
+3. Test the Docker image locally (optional):
+
 ```bash
-gcloud artifacts repositories create weather-etl-repo --repository-format=docker --location=<REGION> --description="Weather ETL repository"
-    
-gcloud artifacts repositories list
+docker build -t japan-weather-etl ./gcp
+docker run --rm -it japan-weather-etl
 ```
 
-5. Submit docker image for Cloud Build
-```bash
-gcloud builds submit --region=<REGION> --tag <REGION>-docker.pkg.dev/PROJECT_ID/weather-etl-repo/japan-weather-etl:tag1 
-```
+4. Configure `gcp/terraform/terraform.tfvars` with the following values:
 
-6. Setup terraform variables file (_terraform.tfvars_) with the following set:
 ```
 project = ""
 region = ""
@@ -139,9 +108,10 @@ overpass_referer = ""
 overpass_user_agent = ""
 ```
 
-7. Deploy using terraform
+5. Deploy with Terraform. Terraform creates the Artifact Registry repository, builds and pushes the image with Cloud Build, and provisions Cloud Run and its supporting resources:
+
 ```bash
-cd terraform
+cd gcp/terraform
 terraform init
 terraform apply
 ```
