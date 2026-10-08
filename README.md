@@ -29,14 +29,14 @@ For both deployment scenarios, the following data is integrated:
         -   Wind speed
         -   Wind direction
 
-# Limitations
+### Limitations
 The Overpass API has limitations on throughput and query size, so several workarounds were made for the projects to work:
     1. GCP
         Limit OverPass query to just query Shinkansen stations
     2. Databricks
         Read a parquet file of stations exported from OpenStreetMap uploaded to a volume
 
-# Data flow
+### Data flow
 The following shows images of the Databricks pipeline, however the GCP setup is relatively similar.
 
 The data flow of the pipeline can be seen in the figure below.
@@ -79,7 +79,7 @@ Weather Summary:
    databricks bundle deploy
    ```
 
-# Deployment Steps (GCP with Terraform)
+### Deployment Steps
 
 1. Enable the following Google Cloud APIs:
 - Artifact Registry (artifactregistry.googleapis.com)
