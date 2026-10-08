@@ -10,18 +10,16 @@ OVERPASS_REFERER = os.getenv("OVERPASS_REFERER")
 # Generate a list of train stations in Japan with their latitude and longitude
 def generate_stations_list():
 
-    # Create Overpass API object with user-agent to fix 406 issue
-    api = overpy.Overpass()
-
     # Query rail stations in Japan using ISO 3166-1 code for Japan (JP)
-    query = f'''
-    [out:json][timeout:180];
-    area["ISO3166-1"="JP"]["admin_level"="2"]->.searchArea;
-    node
-      ["railway"="station"]
-      ["public_transport"="station"]
-      (area.searchArea);
-    out;
+    # Focus on shinkansen to limit API queries
+    query = '''
+    [out:json][timeout:60];
+    area["ISO3166-1"="JP"][admin_level=2]->.japan;
+    nwr
+    ["railway"="station"]
+    ["highspeed"="yes"]
+    (area.japan);
+    out center;
     '''
     
     # Build headers
@@ -36,7 +34,7 @@ def generate_stations_list():
         url = "https://overpass-api.de/api/interpreter",
         data={ "data": query },
         headers = headers,
-        timeout = 180,
+        timeout = 60,
     )
 
     # Raise error
