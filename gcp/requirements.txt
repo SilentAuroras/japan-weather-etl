@@ -1,5 +1,4 @@
 flask
-folium
 google-cloud-bigquery
 geopandas
 openmeteo_requests
@@ -9,4 +8,3 @@ pyarrow
 requests
 requests-cache
 retry_requests
-scikit-learn
