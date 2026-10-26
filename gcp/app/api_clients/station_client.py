@@ -51,9 +51,13 @@ def generate_stations_list():
         longitude = node.lon
         if name:
             stations.append({
+
+                # Standard columns
                 "name": name,
                 "latitude": latitude,
                 "longitude": longitude,
+
+                # BigQuery geography column
                 "geography": f"POINT({longitude} {latitude})"
             })
     
