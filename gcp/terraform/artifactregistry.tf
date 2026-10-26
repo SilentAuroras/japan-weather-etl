@@ -26,6 +26,6 @@ resource "terraform_data" "build_image" {
 
   // Execute local gcloud command to deploy
   provisioner "local-exec" {
-    command = "gcloud.cmd builds submit --project=${var.project} --region=${var.region} --tag=${local.container_image} ${path.module}/.."
+    command = "gcloud builds submit --project=${var.project} --region=${var.region} --tag=${local.container_image} ${path.module}/.."
   }
 }
