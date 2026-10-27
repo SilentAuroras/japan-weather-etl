@@ -88,7 +88,7 @@ def get_weather_forecast(stations):
             "precipitation": current.Variables(2).Value(),          # Current precipitation
             "wind_speed_10m": current.Variables(3).Value(),         # Current wind speed
             "wind_direction_10m": current.Variables(4).Value(),     # Current wind direction
-            'timestamp': pd.Timestamp.utcnow().floor('ms')          # Timestamp for the data
+            'timestamp': pd.Timestamp.now('UTC').floor('ms')        # Timestamp for the data
         }
 
         # Convert the data to a panda frame
