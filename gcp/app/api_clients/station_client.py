@@ -14,12 +14,11 @@ def generate_stations_list():
     # Focus on shinkansen to limit API queries
     query = '''
     [out:json][timeout:60];
-    area["ISO3166-1"="JP"][admin_level=2]->.japan;
     nwr
     ["railway"="station"]
     ["highspeed"="yes"]
-    (area.japan);
-    out center;
+    (area:3600382313);
+    out center tags qt;
     '''
     
     # Build headers
@@ -41,26 +40,39 @@ def generate_stations_list():
     response.raise_for_status()
 
     # Convert JSON to overpy object
-    results = overpy.Overpass.parse_json(response.text)
+    results = overpy.Overpass().parse_json(response.text)
 
-    # Iterate over nodes to pull station name, latitude, longitude
+    # Built stations list
     stations = []
-    for node in results.nodes:
-        name = node.tags.get("name")
-        latitude = node.lat
-        longitude = node.lon
-        if name:
-            stations.append({
 
-                # Standard columns
-                "name": name,
-                "latitude": latitude,
-                "longitude": longitude,
+    # Nodes plus ways/relations (which carry a center point)
+    for element in results.nodes + results.ways + results.relations:
 
-                # BigQuery geography column
-                "geography": f"POINT({longitude} {latitude})"
-            })
-    
+        # Skip those without name
+        name = element.tags.get("name")
+        if not name:
+            continue
+
+        # Pull lat/long from elements
+        latitude = getattr(element, "lat", getattr(element, "center_lat", None))
+        longitude = getattr(element, "lon", getattr(element, "center_lon", None))
+
+        # Skip elements with empty lat/long
+        if latitude is None or longitude is None:
+            continue
+
+        # Build stations record
+        stations.append({
+
+            # Standard columns
+            "name": name,
+            "latitude": latitude,
+            "longitude": longitude,
+
+            # BigQuery geography column
+            "geography": f"POINT({longitude} {latitude})",
+        })
+
     # Generate dataframe for results
     df = pd.DataFrame(stations)
 

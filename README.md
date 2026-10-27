@@ -31,6 +31,6 @@ For both deployment scenarios, the following data is integrated:
 ## Limitations
 The Overpass API has limitations on throughput and query size, so several workarounds were made for the projects to work:
  
-1. GCP - Self-hosted Overpass API in GCP on Compute
+1. GCP - Just query roughly 64 shinkansen stations
 
 2. Databricks - Parquet file of stations exported from OpenStreetMap

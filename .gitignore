@@ -11,6 +11,7 @@ build/
 dist/
 
 # IDE settings
+.vscode/
 .idea/
 
 # Python
