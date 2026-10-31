@@ -86,6 +86,12 @@ def main():
         # Read parquet
         stations_df = pd.read_parquet(stations_file)
 
+    # Cast as float
+    stations_df = stations_df.astype({'latitude': 'float64', 'longitude': 'float64'})
+
+    # Save stations df as file in gcs
+    stations_df.to_parquet(stations_file, index=False)
+
     # Call function to load stations into BQ
     load_parquet_to_bigquery(
         "station-coordinates.parquet",
