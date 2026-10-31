@@ -80,8 +80,8 @@ def get_weather_forecast(stations):
         # Generate response dictionary
         weather_data = {
             'cluster': row.cluster,                                 # Cluster ID
-            "latitude": latitude,                                   # Provided latitude
-            "longitude": longitude,                                 # Provided longitude
+            "latitude": float(latitude),                                   # Provided latitude
+            "longitude": float(longitude),                          # Provided longitude
             "geography": f"POINT({longitude} {latitude})",          # BigQuery GEOGRAPHY
             "temperature_2m": current.Variables(0).Value(),         # Current temperature
             "is_day": current.Variables(1).Value(),                 # Current day or night
@@ -110,6 +110,23 @@ def get_weather_forecast(stations):
     
     # Merge weather dataframe back into all stations, assign weather by cluster
     df = stations.merge(rep_weather[weather_columns], on='cluster', how='left')
+
+    # Cast columns to match BigQuery schema
+    df = df.astype({
+        'name': 'string',
+        'latitude': 'float64',
+        'longitude': 'float64',
+        'geography': 'string',
+        'cluster': 'int64',
+        'temperature_2m': 'float64',
+        'is_day': 'float64',
+        'precipitation': 'float64',
+        'wind_speed_10m': 'float64',
+        'wind_direction_10m': 'float64',
+    })
+
+    # Format timestamp
+    df['timestamp'] = pd.to_datetime(df['timestamp'], utc=True).astype('datetime64[us, UTC]')
 
     # Log done
     logging.info(f"Weather client finished")

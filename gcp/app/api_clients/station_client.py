@@ -61,11 +61,15 @@ def generate_stations_list():
         if latitude is None or longitude is None:
             continue
 
+        # Cast as float
+        latitude = float(latitude)
+        longitude = float(longitude)
+
         # Build stations record
         stations.append({
 
             # Standard columns
-            "name": name,
+            "name": str(name),
             "latitude": latitude,
             "longitude": longitude,
 

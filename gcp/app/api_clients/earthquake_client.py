@@ -52,8 +52,8 @@ def get_earthquake_events():
         if col in df_detailed_events.columns:
             df_detailed_events = df_detailed_events.drop([col], axis=1)
 
-    # Log success
-    logging.info(f"Successfully downloaded quake data")
+    # Cast all columns as string
+    df_detailed_events = df_detailed_events.astype('string')
 
     # Return df
     return df_detailed_events

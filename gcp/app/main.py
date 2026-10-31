@@ -45,6 +45,13 @@ def load_parquet_to_bigquery(file_name, table_name, write_disposition):
 # Define main to call helpers and create parquet files
 def main():
 
+    # Output subfolder
+    sub_folder = "data/raw"
+
+    # Check the subfolder exists
+    if not os.path.exists(sub_folder):
+        os.makedirs(sub_folder, exist_ok=True)
+
     # Check env variables exist
     if not OVERPASS_USER_AGENT or not OVERPASS_REFERER:
 
@@ -62,7 +69,7 @@ def main():
     logging.info(f'Pulling station list...')
 
     # Define stations filename
-    stations_file = f'data/raw/station-coordinates.parquet'
+    stations_file = f"{sub_folder}/station-coordinates.parquet"
 
     # Generate list if stations list does not already exist
     if not os.path.exists(stations_file):
@@ -71,7 +78,7 @@ def main():
         stations_df = generate_stations_list()
 
         # Generate stations parquet
-        stations_df.to_parquet("data/raw/station-coordinates.parquet", index=False)
+        stations_df.to_parquet(f"{sub_folder}/station-coordinates.parquet", index=False)
 
     # Use existing stations list
     else:
@@ -100,7 +107,7 @@ def main():
     timestamp = time.strftime("%Y%m%d-%H%M%S")
 
     # Create a parquet file locally
-    weather_df.to_parquet(f'data/raw/weather-{timestamp}.parquet', index=False)
+    weather_df.to_parquet(f"{sub_folder}/weather-{timestamp}.parquet", index=False)
 
     # Load weather into BQ
     load_parquet_to_bigquery(
@@ -133,7 +140,7 @@ def main():
         ]
 
         # Convert df to parquet
-        quake_df.to_parquet(f'data/raw/quake-{timestamp}.parquet', index=False)
+        quake_df.to_parquet(f"{sub_folder}/quake-{timestamp}.parquet", index=False)
 
         # Load Earthquake events into BQ
         load_parquet_to_bigquery(
