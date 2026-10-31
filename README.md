@@ -28,6 +28,8 @@ For both deployment scenarios, the following data is integrated:
         -   Wind speed
         -   Wind direction
 
+Both of the repos parse the data, remove malformed data, and map details such as temperature on maps.
+
 ## Limitations
 The Overpass API has limitations on throughput and query size, so several workarounds were made for the projects to work:
  
